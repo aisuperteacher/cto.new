@@ -1,0 +1,37 @@
+# Kubernetes
+*.kubeconfig
+kubeconfig
+.kube/
+*.key
+*.crt
+*.pem
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.vim/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# etcd backups
+etcd-snapshot-*.db
