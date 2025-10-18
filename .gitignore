@@ -1,65 +1,59 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Log files
 *.log
+logs/
 
-# Virtual Environment
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-
-# IDEs
-.vscode/
-.idea/
+# Temporary files
+*.tmp
+*.temp
 *.swp
 *.swo
 *~
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# OS specific
 .DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 
-# Docker
-*.tar
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.sublime-*
 
-# Kubernetes
-*.kubeconfig
-kubeconfig
-.kube/
+# Test and coverage
+.coverage
+htmlcov/
+coverage/
+*.cover
 
-# Secrets and credentials
-*.pem
+# Build artifacts
+dist/
+build/
+
+# Local testing environment
+test-env/
+local-test/
+
+# Secrets and credentials (if any)
 *.key
+*.pem
 *.crt
 secrets/
-*.env
-.env.local
+credentials/
 
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# OS
-Thumbs.db
-.DS_Store
+# Kubernetes specific temporary files
+kubeconfig
+*.kubeconfig
+admin.conf
