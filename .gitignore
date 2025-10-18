@@ -1,59 +1,37 @@
-# Log files
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.temp
-*.swp
-*.swo
-*~
+# Kubernetes
+*.kubeconfig
+kubeconfig
+.kube/
+*.key
+*.crt
+*.pem
 
 # Backup files
 *.bak
 *.backup
-*.old
+*~
 
-# OS specific
+# OS files
 .DS_Store
 Thumbs.db
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 
-# IDE and editor files
+# Editor files
 .vscode/
 .idea/
-*.iml
-.project
-.classpath
-.settings/
-*.sublime-*
+*.swp
+*.swo
+*.swn
+.vim/
 
-# Test and coverage
-.coverage
-htmlcov/
-coverage/
-*.cover
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
 
-# Build artifacts
-dist/
-build/
+# Logs
+*.log
+logs/
 
-# Local testing environment
-test-env/
-local-test/
-
-# Secrets and credentials (if any)
-*.key
-*.pem
-*.crt
-secrets/
-credentials/
-
-# Kubernetes specific temporary files
-kubeconfig
-*.kubeconfig
-admin.conf
+# etcd backups
+etcd-snapshot-*.db
