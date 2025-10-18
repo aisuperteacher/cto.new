@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      type: local
+      app: sample-app
+
+---
+# 动态存储配置的 PVC 示例
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc-dynamic
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  storageClassName: fast-ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# 共享存储 PVC 示例
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc-shared
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+# 带有资源限制的 PVC 示例
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc-limited
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+    limits:
+      storage: 10Gi
+  volumeMode: Filesystem

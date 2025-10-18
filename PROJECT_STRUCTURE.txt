@@ -1,0 +1,113 @@
+Kubernetes 集群自动化部署脚本项目结构
+==========================================
+
+项目根目录: /home/engine/project
+分支: feat-cluster-auto-deploy-scripts-centos7-8-calico-flannel
+
+文件结构:
+├── .gitignore                      # Git 忽略文件配置
+├── README.md                       # 主文档（14.8KB）
+├── CHANGELOG.md                    # 更新日志（4.0KB）
+├── PROJECT_STRUCTURE.txt           # 本文件
+├── scripts/                        # 脚本目录
+│   ├── prep-system.sh             # 系统准备脚本（18KB, 可执行）
+│   ├── install-docker-k8s.sh      # Docker/K8s 安装脚本（22KB, 可执行）
+│   ├── init-master.sh             # Master 初始化脚本（22KB, 可执行）
+│   └── join-worker.sh             # Worker 加入脚本（18KB, 可执行）
+└── docs/                           # 文档目录
+    ├── QUICK_REFERENCE.md         # 快速参考（11KB）
+    ├── TROUBLESHOOTING.md         # 故障排查指南（18KB）
+    └── EXAMPLES.md                # 部署示例（15KB）
+
+统计信息:
+- 总文件数: 11
+- Shell 脚本: 4 个
+- 文档文件: 7 个
+- 总代码行数: 5,403 行
+
+核心功能:
+1. prep-system.sh
+   - 禁用 SELinux 和防火墙
+   - 配置内核参数和系统优化
+   - 禁用 swap
+   - 配置时间同步
+   - 设置主机名和 hosts
+   - 配置 IPVS 模块
+   - 严格的错误处理和日志记录
+
+2. install-docker-k8s.sh
+   - 支持 Docker 和 containerd 两种运行时
+   - 安装 kubeadm, kubelet, kubectl
+   - 配置 cgroup 驱动
+   - 支持镜像加速器（阿里云）
+   - 预拉取 Kubernetes 镜像
+   - 完整的安装验证
+
+3. init-master.sh
+   - 初始化 Kubernetes Master 节点
+   - 支持 Calico 和 Flannel 网络插件
+   - 自动生成 kubeadm 配置
+   - 配置 kubectl 访问
+   - 生成 Worker 加入命令
+   - 支持 HA（高可用）模式
+   - 集群状态验证
+
+4. join-worker.sh
+   - Worker 节点加入集群
+   - 支持 SSH 自动获取加入信息
+   - 支持交互式和非交互式模式
+   - 配置节点标签
+   - 完整的加入状态验证
+
+支持的系统:
+- CentOS 7.x
+- CentOS 8.x
+- Rocky Linux 8.x
+- AlmaLinux 8.x
+
+支持的网络插件:
+- Calico v3.26.1 (默认)
+- Flannel v0.22.0
+
+支持的容器运行时:
+- containerd 1.6+ (推荐)
+- Docker 20.10+
+
+主要特性:
+✅ 严格的错误处理（set -euo pipefail + trap）
+✅ 详细的日志记录（/var/log/k8s-deploy/）
+✅ 完整的环境检查
+✅ 彩色日志输出
+✅ 参数验证和帮助信息
+✅ 镜像加速支持（国内环境）
+✅ 多种部署模式支持
+✅ 交互式和非交互式运行
+✅ 完整的验证机制
+✅ 丰富的文档和示例
+
+文档内容:
+- README.md: 完整的项目介绍、使用指南、故障排查
+- QUICK_REFERENCE.md: 快速命令参考和常见场景
+- TROUBLESHOOTING.md: 详细的故障排查指南
+- EXAMPLES.md: 各种部署场景的完整示例
+- CHANGELOG.md: 版本更新历史
+
+使用示例:
+# 快速部署单 Master 集群
+1. 所有节点: sudo ./prep-system.sh
+2. 所有节点: sudo ./install-docker-k8s.sh --runtime containerd --use-mirror
+3. Master: sudo ./init-master.sh --network-plugin calico
+4. Worker: sudo ./join-worker.sh --master-ssh root@<master-ip>
+
+日志位置:
+/var/log/k8s-deploy/
+├── prep-system-YYYYMMDD-HHMMSS.log
+├── install-docker-k8s-YYYYMMDD-HHMMSS.log
+├── init-master-YYYYMMDD-HHMMSS.log
+├── join-worker-YYYYMMDD-HHMMSS.log
+└── kubeadm-join-command.sh
+
+版本信息:
+- 项目版本: 1.0.0
+- 推荐 Kubernetes 版本: 1.28.0
+- 最后更新: 2024-10-18
