@@ -1,0 +1,221 @@
+# Calico 网络策略配置示例
+# 注意：Calico 支持 Kubernetes NetworkPolicy 以及扩展的 Calico NetworkPolicy
+
+---
+# 标准 Kubernetes NetworkPolicy - 限制入站流量
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sample-app-allow-ingress
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: sample-app
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: frontend
+    - podSelector:
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 8080
+
+---
+# 标准 Kubernetes NetworkPolicy - 限制出站流量
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sample-app-allow-egress
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: sample-app
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53
+
+---
+# Calico NetworkPolicy - 全局默认拒绝策略
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  order: 1000
+  selector: all()
+  types:
+  - Ingress
+  - Egress
+
+---
+# Calico NetworkPolicy - 允许特定应用通信
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: sample-app-calico-policy
+  namespace: default
+spec:
+  order: 10
+  selector: app == "sample-app"
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: role == "frontend"
+    destination:
+      ports:
+      - 8080
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - 10.0.0.0/8
+    destination:
+      ports:
+      - 8080
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: app == "database"
+      ports:
+      - 5432
+  - action: Allow
+    protocol: UDP
+    destination:
+      ports:
+      - 53
+
+---
+# Calico NetworkPolicy - 高级规则（基于服务账号）
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: sample-app-serviceaccount-policy
+  namespace: default
+spec:
+  order: 20
+  selector: app == "sample-app"
+  serviceAccountSelector: name == "sample-app-sa"
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      serviceAccounts:
+        names:
+        - frontend-sa
+    destination:
+      ports:
+      - 8080
+
+---
+# Calico HostEndpoint - 保护节点本身
+apiVersion: projectcalico.org/v3
+kind: HostEndpoint
+metadata:
+  name: node-1-eth0
+  labels:
+    host: node-1
+    role: worker
+spec:
+  interfaceName: eth0
+  node: node-1
+  expectedIPs:
+  - 192.168.1.10
+
+---
+# Calico GlobalNetworkPolicy - 允许 DNS 查询
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-dns-egress
+spec:
+  order: 100
+  selector: all()
+  types:
+  - Egress
+  egress:
+  - action: Allow
+    protocol: UDP
+    destination:
+      ports:
+      - 53
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 53
+
+---
+# Calico NetworkPolicy - 限制外部访问
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: sample-app-external-access
+  namespace: default
+spec:
+  order: 30
+  selector: app == "sample-app"
+  types:
+  - Ingress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - 0.0.0.0/0
+      notNets:
+      - 192.168.100.0/24  # 禁止特定网段
+    destination:
+      ports:
+      - 8080
+  - action: Deny
+    protocol: TCP
+    source:
+      nets:
+      - 192.168.100.0/24
+
+---
+# Calico NetworkPolicy - 基于时间的访问控制（需要 Calico Enterprise）
+# apiVersion: projectcalico.org/v3
+# kind: NetworkPolicy
+# metadata:
+#   name: sample-app-time-based
+#   namespace: default
+# spec:
+#   selector: app == "sample-app"
+#   types:
+#   - Ingress
+#   ingress:
+#   - action: Allow
+#     protocol: TCP
+#     source:
+#       selector: role == "maintenance"
+#     destination:
+#       ports:
+#       - 8080
+#     schedule:
+#       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+#       hours: ["09:00-17:00"]

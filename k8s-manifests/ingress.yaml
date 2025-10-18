@@ -1,0 +1,83 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-app-ingress
+  namespace: default
+  labels:
+    app: sample-app
+  annotations:
+    # Nginx Ingress Controller 注解
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # 限流配置
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    # CORS 配置
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: sample-app.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-app-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - sample-app.example.com
+    secretName: sample-app-tls
+
+---
+# TLS Secret 示例（需要替换为实际证书）
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sample-app-tls
+  namespace: default
+type: kubernetes.io/tls
+data:
+  # 使用 base64 编码的证书和密钥
+  # tls.crt: <base64-encoded-certificate>
+  # tls.key: <base64-encoded-private-key>
+  # 示例生成自签名证书：
+  # openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  #   -keyout tls.key -out tls.crt -subj "/CN=sample-app.example.com"
+  # kubectl create secret tls sample-app-tls --cert=tls.crt --key=tls.key
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0t
+
+---
+# 多路径路由示例
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-app-ingress-advanced
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /app(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-app-service
+            port:
+              number: 80
+      - path: /api(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-app-service
+            port:
+              number: 80

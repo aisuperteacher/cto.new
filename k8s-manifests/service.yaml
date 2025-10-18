@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app-service
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  type: ClusterIP
+  selector:
+    app: sample-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  sessionAffinity: None
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app-nodeport
+  namespace: default
+  labels:
+    app: sample-app
+spec:
+  type: NodePort
+  selector:
+    app: sample-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    nodePort: 30080
+    protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app-loadbalancer
+  namespace: default
+  labels:
+    app: sample-app
+  annotations:
+    # 云服务商特定注解示例
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: sample-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  # loadBalancerIP: 192.168.1.100  # 可选：指定固定 IP
+  # loadBalancerSourceRanges:       # 可选：限制访问来源
+  # - 192.168.0.0/16
